@@ -16,7 +16,7 @@ function getClientIp(req) {
   return ip;
 };
 const mysql = require('mysql');
-const pool = mysql.createPool({
+const sql = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
@@ -24,26 +24,33 @@ const pool = mysql.createPool({
   database: process.env.DB_DATABASE
 });
 router.get('/', function (req, res, next) {
-  /*console.log(getClientIp(req));
-  res.render('index');*/
+  var check = false;
+  var client_ip = getClientIp(req);
   sql.getConnection((error, connection) =>
   {
-    if (error)
+    if (!error)
     {
-      console.log("error");
-    }
-    else
-    {
-      connection.query( 'SELECT * FROM `memo`',
+      connection.query( 'SELECT * FROM `list`',
           function (err, results, fields)
           {
-            if (error)
+            if (!error)
             {
-              console.log("error");
-            }
-            for (i = 0; i < results.length; i++)
-            {
-              console.log(JSON.stringify(results[i]));
+              for(var i=0;i<results.length;i++)
+              {
+                const temp = JSON.parse(JSON.stringify(results[i]));
+                if(temp["ip"] == client_ip)
+                {
+                  check = true;
+                }
+              }
+              if(check === true)
+              {
+                res.render('error');
+              }
+              else
+              {
+                res.render('index');
+              }
             }
           })
       sql.end(
@@ -51,7 +58,7 @@ router.get('/', function (req, res, next) {
           {
             if (error)
             {
-              console.log(error)
+              console.log("error")
             }
           });
     }
