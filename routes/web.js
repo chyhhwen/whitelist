@@ -9,9 +9,6 @@ router.get('/', function (req, res, next) {
   res.render('index');
 });
 
-router.post('/searchList', (req, res) => {
-  res.send(req.body);
-});
 router.post('/check-login', (req, res) => {
   var user = req.body.username;
   var pass = req.body.password;
@@ -24,8 +21,5 @@ router.post('/check-login', (req, res) => {
     res.redirect('/');
   }
 });
-router.get('/todos', todoController.getAll);
-
-router.get('/test', todoController.getDB);
 
 module.exports = router;
