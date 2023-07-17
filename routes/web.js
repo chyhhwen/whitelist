@@ -16,64 +16,33 @@ function getClientIp(req) {
   console.log(ip);
   return ip;
 };
-const mysql = require('mysql');
-const sql = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-  database: process.env.DB_DATABASE
-});
-router.get('/', function (req, res, next) {
+router.get('/', async (req, res, next) =>{
   var check = false;
   var client_ip = getClientIp(req);
-  sql.getConnection((error, connection) =>
-  {
-    if (!error)
-    {
-      connection.query( 'SELECT * FROM `list`',
-          function (err, results, fields)
-          {
-            if (!error)
-            {
-              for(var i=0;i<results.length;i++)
-              {
-                const temp = JSON.parse(JSON.stringify(results[i]));
-                if(temp["ip"] == client_ip)
-                {
-                  check = true;
-                }
-              }
-              if(check === true)
-              {
-                res.render('error');
-              }
-              else
-              {
-                res.render('index');
-              }
-            }
-          })
-      sql.end(
-          function (error)
-          {
-            if (error)
-            {
-              console.log("error")
-            }
-          });
-    }
-  });
-});
-router.get('/test', async (req, res, next) =>  {
-  const { statusCode, data, headers } = await curly.get('http://localhost:3000/api/', {
-    postFields: JSON.stringify({ field: 'value' }),
+  const { statusCode, data, headers } = await curly.get('http://localhost:3000/api/list', {
     httpHeader: [
       'Content-Type: application/json',
       'Accept: application/json'
     ],
   })
-  console.log(data);
+  for(var i=0;i<data.length;i++)
+  {
+    if(client_ip === data[i]["ip"])
+    {
+      check = true;
+    }
+  }
+  if(check)
+  {
+    res.render("error");
+  }
+  else
+  {
+    res.render("index");
+  }
+});
+router.get('/test', async (req, res, next) =>  {
+
   res.render('index');
 });
 router.post('/check-login', (req, res) => {
