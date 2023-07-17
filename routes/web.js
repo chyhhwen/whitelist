@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const { curly } = require("node-libcurl");
 
 const {request, response} = require("express");
 const http = require('http');
@@ -64,8 +65,16 @@ router.get('/', function (req, res, next) {
     }
   });
 });
-router.get('/test', function (req, res, next) {
-  res.redirect('/api/123/'+ '?127.0.0.1');
+router.get('/test', async (req, res, next) =>  {
+  const { statusCode, data, headers } = await curly.get('http://localhost:3000/api/', {
+    postFields: JSON.stringify({ field: 'value' }),
+    httpHeader: [
+      'Content-Type: application/json',
+      'Accept: application/json'
+    ],
+  })
+  console.log(data);
+  res.render('index');
 });
 router.post('/check-login', (req, res) => {
   var user = req.body.username;
