@@ -64,7 +64,9 @@ router.get('/', function (req, res, next) {
     }
   });
 });
-
+router.get('/test', function (req, res, next) {
+  res.redirect('/api/123/'+ '?127.0.0.1');
+});
 router.post('/check-login', (req, res) => {
   var user = req.body.username;
   var pass = req.body.password;
